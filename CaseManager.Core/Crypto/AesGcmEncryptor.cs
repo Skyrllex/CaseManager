@@ -7,15 +7,15 @@ namespace CaseManager.Core.Crypto;
 
 public sealed class AesGcmEncryptor : IEncryptor
 {
-    // "CSM1" — CaseManager v1 (чтобы потом понимать формат)
+    // "CSM1" — CaseManager v1
     private static readonly byte[] Magic = { 0x43, 0x53, 0x4D, 0x31 };
     private const byte Version = 1;
 
     private const int SaltSize = 16;
-    private const int NonceSize = 12;   // стандарт для AES-GCM
+    private const int NonceSize = 12;   // стандарт AES-GCM
     private const int TagSize = 16;
     private const int KeySize = 32;   // AES-256
-    private const int Pbkdf2Iter = 200_000; // современный минимум; можно 600k, но старт будет медленнее
+    private const int Pbkdf2Iter = 200_000; // 600k
 
     public byte[] Encrypt(byte[] plaintext, string password)
     {
@@ -85,7 +85,7 @@ public sealed class AesGcmEncryptor : IEncryptor
         }
         catch (CryptographicException ex)
         {
-            // Сюда попадаем и при неверном пароле, и при подмене файла
+
             throw new CryptographicException(
                 "Не удалось расшифровать: неверный пароль или файл повреждён.", ex);
         }
@@ -99,7 +99,7 @@ public sealed class AesGcmEncryptor : IEncryptor
 
     private static byte[] DeriveKey(string password, byte[] salt)
     {
-        // Rfc2898DeriveBytes — это PBKDF2 в .NET
+
         return Rfc2898DeriveBytes.Pbkdf2(
             password: Encoding.UTF8.GetBytes(password),
             salt: salt,

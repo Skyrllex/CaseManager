@@ -16,8 +16,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // ќдинарный клик по документу Ч открывает просмотр.
-        // ≈сли захочешь двойной Ч замени TappedEvent на DoubleTappedEvent.
+        // ќдинарный - TappedEvent,  двойной - DoubleTappedEvent.
         AddHandler(TappedEvent, OnDocumentTapped, RoutingStrategies.Bubble);
     }
 
@@ -25,9 +24,6 @@ public partial class MainWindow : Window
     {
         if (e.Source is not Control source) return;
 
-        // »щем CaseDocument вверх по визуальному дереву.
-        // »ногда e.Source Ч это TextBlock, а DataContext у него
-        // унаследован от Border, но напр€мую может быть null.
         CaseDocument? doc = null;
         Visual? v = source;
         while (v != null)

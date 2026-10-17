@@ -1,0 +1,17 @@
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+# Папка с данными пользователя
+Data/
+debug_*.json
+*.log
+
+# Временные файлы
+*.tmp
+*.dat
+
+LicenseManager.cs

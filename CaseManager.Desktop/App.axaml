@@ -1,0 +1,61 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CaseManager.Desktop.App"
+             RequestedThemeVariant="Light">
+
+	<Application.Resources>
+		<FontFamily x:Key="DefaultFont">Segoe UI, Arial, sans-serif</FontFamily>
+	</Application.Resources>
+
+	<Application.Styles>
+		<FluentTheme/>
+		<Style Selector="Window">
+			<Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif"/>
+		</Style>
+		<Style Selector="ComboBox">
+			<Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif"/>
+		</Style>
+		<Style Selector="Button">
+			<Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif"/>
+		</Style>
+		<!-- Основная (синяя) кнопка -->
+		<Style Selector="Button.primary">
+			<Setter Property="Background" Value="#3B82F6"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Padding" Value="16,9"/>
+			<Setter Property="CornerRadius" Value="8"/>
+		</Style>
+		<Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#2563EB"/>
+			<Setter Property="TextBlock.Foreground" Value="White"/>
+		</Style>
+
+		<!-- Опасная (красная) кнопка -->
+		<Style Selector="Button.danger">
+			<Setter Property="Background" Value="#FEE2E2"/>
+			<Setter Property="Foreground" Value="#DC2626"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Padding" Value="16,9"/>
+			<Setter Property="CornerRadius" Value="8"/>
+		</Style>
+		<Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#FECACA"/>
+			<Setter Property="TextBlock.Foreground" Value="#991B1B"/>
+		</Style>
+
+		<!-- Обычная нейтральная кнопка -->
+		<Style Selector="Button.ghost">
+			<Setter Property="Background" Value="#F1F5F9"/>
+			<Setter Property="Foreground" Value="#334155"/>
+			<Setter Property="Padding" Value="16,9"/>
+			<Setter Property="CornerRadius" Value="8"/>
+		</Style>
+		<Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#E2E8F0"/>
+		</Style>
+	</Application.Styles>
+</Application>

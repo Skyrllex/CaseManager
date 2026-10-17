@@ -1,0 +1,66 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CaseManager.Desktop.Views.DocumentViewerWindow"
+        Title="Просмотр документа"
+        Width="900" Height="700"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8FAFC">
+
+	<Grid RowDefinitions="Auto,*" Margin="16">
+
+		<!-- Шапка: имя файла + кнопка "открыть в системе" -->
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+			<TextBlock Grid.Column="0"
+					   Name="FileNameText"
+					   FontWeight="SemiBold" FontSize="16"
+					   VerticalAlignment="Center"
+					   TextTrimming="CharacterEllipsis"/>
+			<Button Grid.Column="1"
+					Name="OpenExternalButton"
+					Content="↗️ Открыть в системе"
+					Classes="ghost"
+					HorizontalAlignment="Right"/>
+		</Grid>
+
+		<!-- Область просмотра -->
+		<Border Grid.Row="1" Background="White" CornerRadius="8" Padding="12">
+			<Grid>
+
+				<!-- Текстовый просмотр -->
+				<ScrollViewer Name="TextScroll" IsVisible="False">
+					<TextBlock Name="TextContent"
+							   TextWrapping="Wrap"
+							   FontFamily="Consolas, Courier New, monospace"
+							   FontSize="12"/>
+				</ScrollViewer>
+
+				<!-- Просмотр картинки -->
+				<ScrollViewer Name="ImageScroll" IsVisible="False">
+					<Image Name="ImageContent"
+						   Stretch="None"
+						   HorizontalAlignment="Center"
+						   VerticalAlignment="Top"/>
+				</ScrollViewer>
+
+				<!-- Fallback: предпросмотр невозможен -->
+				<StackPanel Name="FallbackPanel"
+							IsVisible="False"
+							VerticalAlignment="Center" HorizontalAlignment="Center"
+							Spacing="12">
+					<TextBlock Text="👁" FontSize="48"
+							   HorizontalAlignment="Center" Opacity="0.3"/>
+					<TextBlock Text="Предпросмотр недоступен для этого формата"
+							   FontSize="14" Opacity="0.6"
+							   HorizontalAlignment="Center"/>
+					<TextBlock Text="Нажмите «Открыть в системе», чтобы просмотреть во внешнем приложении"
+							   FontSize="12" Opacity="0.4"
+							   HorizontalAlignment="Center"
+							   TextWrapping="Wrap"
+							   MaxWidth="500"
+							   TextAlignment="Center"/>
+				</StackPanel>
+
+			</Grid>
+		</Border>
+	</Grid>
+</Window>

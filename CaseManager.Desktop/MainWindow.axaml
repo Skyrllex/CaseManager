@@ -1,0 +1,169 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CaseManager.Desktop.ViewModels"
+        xmlns:models="using:CaseManager.Core.Models"
+        xmlns:conv="using:CaseManager.Desktop.Converters"
+        x:Class="CaseManager.Desktop.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:Name="Root"
+        Title="Case Manager"
+        Width="1200" Height="750"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8FAFC">
+
+	<Grid RowDefinitions="Auto,*" ColumnDefinitions="380,*" Margin="16">
+
+		<!-- Меню  -->
+		<StackPanel Grid.Row="0" Grid.ColumnSpan="2"
+					Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
+			<Button Content="+ Новое дело" Classes="primary"
+					Command="{Binding CreateCaseCommand}"/>
+			<Button Content="✎ Редактировать" Classes="ghost"
+					Command="{Binding EditCaseCommand}"/>
+			<Button Content="📎 Добавить документ" Classes="ghost"
+					Command="{Binding AddDocumentCommand}"/>
+			<Button Content="🗑 Удалить" Classes="danger"
+					Command="{Binding DeleteCaseCommand}"/>
+		</StackPanel>
+
+		<!-- Список дел (слева)  -->
+		<Border Grid.Row="1" Grid.Column="0"
+				Background="White" CornerRadius="8" Padding="8"
+				BoxShadow="0 1 3 0 #14000000" Margin="0,0,12,0">
+			<ListBox ItemsSource="{Binding Cases}"
+					 SelectedItem="{Binding SelectedCase}"
+					 Background="Transparent"
+					 BorderThickness="0">
+				<ListBox.ItemTemplate>
+					<DataTemplate x:DataType="models:Case">
+						<StackPanel Spacing="4" Margin="4">
+							<TextBlock Text="{Binding Title}"
+									   FontWeight="SemiBold" FontSize="14"
+									   TextTrimming="CharacterEllipsis"/>
+							<TextBlock Text="{Binding ShortDescription}"
+									   FontSize="12" Opacity="0.6"
+									   TextTrimming="CharacterEllipsis"/>
+							<StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+								<Border Background="#DBEAFE" CornerRadius="4" Padding="6,2">
+									<TextBlock Text="{Binding Type,
+                      Converter={x:Static conv:CaseTypeConverter.Instance}}"
+										FontSize="10" Foreground="#1E40AF"/>
+								</Border>
+								<Border Background="#DCFCE7" CornerRadius="4" Padding="6,2">
+									<TextBlock Text="{Binding Stage,
+                      Converter={x:Static conv:CaseStageConverter.Instance}}"
+										FontSize="10" Foreground="#166534"/>
+								</Border>
+							</StackPanel>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Border>
+
+		<!--  Детали дела (справа)-->
+		<Border Grid.Row="1" Grid.Column="1"
+				Background="White" CornerRadius="8" Padding="24"
+				BoxShadow="0 1 3 0 #14000000">
+			<ScrollViewer>
+				<StackPanel Spacing="16"
+							IsVisible="{Binding SelectedCase,
+                        Converter={x:Static ObjectConverters.IsNotNull}}">
+
+					<TextBlock Text="{Binding SelectedCase.Title}"
+							   FontSize="24" FontWeight="Bold" TextWrapping="Wrap"/>
+
+					<Border Background="#F1F5F9" CornerRadius="6" Padding="14">
+						<StackPanel Spacing="8">
+							<StackPanel Orientation="Horizontal" Spacing="8">
+								<TextBlock Text="Тип:" FontWeight="SemiBold"/>
+								<TextBlock Text="{Binding SelectedCase.Type,
+                    Converter={x:Static conv:CaseTypeConverter.Instance}}"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="8">
+								<TextBlock Text="Стадия:" FontWeight="SemiBold"/>
+								<TextBlock Text="{Binding SelectedCase.Stage,
+                    Converter={x:Static conv:CaseStageConverter.Instance}}"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="8">
+								<TextBlock Text="Создано:" FontWeight="SemiBold"/>
+								<TextBlock Text="{Binding SelectedCase.CreatedAt,
+                    StringFormat='{}{0:g}'}"/>
+							</StackPanel>
+						</StackPanel>
+					</Border>
+
+					<StackPanel Spacing="4">
+						<TextBlock Text="Цель" FontWeight="SemiBold" FontSize="14"/>
+						<TextBlock Text="{Binding SelectedCase.Goal}" TextWrapping="Wrap"/>
+					</StackPanel>
+
+					<StackPanel Spacing="4">
+						<TextBlock Text="Краткое описание" FontWeight="SemiBold" FontSize="14"/>
+						<TextBlock Text="{Binding SelectedCase.ShortDescription}" TextWrapping="Wrap"/>
+					</StackPanel>
+
+					<!-- Участники -->
+					<StackPanel Spacing="8">
+						<TextBlock Text="Участники" FontWeight="SemiBold" FontSize="14"/>
+						<ItemsControl ItemsSource="{Binding SelectedCase.Parties}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="models:Party">
+									<Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="6">
+										<StackPanel Spacing="2">
+											<StackPanel Orientation="Horizontal" Spacing="8">
+												<TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+												<TextBlock Text="—" Opacity="0.4"/>
+												<TextBlock Text="{Binding Role,
+										Converter={x:Static conv:PartyRoleConverter.Instance}}"
+													Opacity="0.7" FontStyle="Italic"/>
+											</StackPanel>
+											<TextBlock Text="{Binding Contacts}" FontSize="11" Opacity="0.6"
+													   IsVisible="{Binding Contacts,
+                                    Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+											<TextBlock Text="{Binding Address}" FontSize="11" Opacity="0.6"
+													   IsVisible="{Binding Address,
+                                    Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+											<TextBlock Text="{Binding Description}" FontSize="11" Opacity="0.5"
+													   TextWrapping="Wrap"
+													   IsVisible="{Binding Description,
+                                    Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</StackPanel>
+
+					<!-- Документы -->
+					<StackPanel Spacing="8">
+						<TextBlock Text="Документы" FontWeight="SemiBold" FontSize="14"/>
+						<TextBlock Text="Двойной клик по документу — открыть просмотр"
+								   FontSize="11" Opacity="0.5" FontStyle="Italic"/>
+						<ItemsControl ItemsSource="{Binding SelectedCase.Documents}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate x:DataType="models:CaseDocument">
+									<Border Background="Transparent"
+											Padding="6" Margin="0,0,0,2"
+											BorderBrush="#E2E8F0" BorderThickness="0,0,0,1"
+											Cursor="Hand">
+										<StackPanel Background="Transparent">
+											<TextBlock Text="{Binding FileName}" FontWeight="SemiBold"
+													   Foreground="#2563EB"
+													   Background="Transparent"/>
+											<TextBlock Text="{Binding UploadedAt, StringFormat='{}{0:g}'}"
+											 FontSize="11" Opacity="0.5"
+											Background="Transparent"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</StackPanel>
+					
+					
+				</StackPanel>
+			</ScrollViewer>
+		</Border>
+	</Grid>
+</Window>

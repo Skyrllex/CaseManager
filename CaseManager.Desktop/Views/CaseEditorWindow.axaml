@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CaseManager.Desktop.ViewModels"
+        xmlns:models="using:CaseManager.Core.Models"
+        xmlns:conv="using:CaseManager.Desktop.Converters"
+        x:Class="CaseManager.Desktop.Views.CaseEditorWindow"
+        x:DataType="vm:CaseEditorViewModel"
+        Title="{Binding WindowTitle}"
+        Width="720" Height="820"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8FAFC">
+
+	<Grid RowDefinitions="*,Auto" Margin="20">
+
+		<ScrollViewer Grid.Row="0">
+			<StackPanel Spacing="14">
+
+				<TextBlock Text="Название" FontWeight="SemiBold"/>
+				<TextBox Text="{Binding Title}" Padding="10,8" CornerRadius="6"/>
+
+				<TextBlock Text="Краткое описание" FontWeight="SemiBold"/>
+				<TextBox Text="{Binding ShortDescription}"
+						 AcceptsReturn="True" Height="70"
+						 TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
+
+				<TextBlock Text="Цель" FontWeight="SemiBold"/>
+				<TextBox Text="{Binding Goal}"
+						 AcceptsReturn="True" Height="70"
+						 TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
+
+				<Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+					<StackPanel Grid.Column="0" Spacing="4">
+						<TextBlock Text="Тип судопроизводства" FontWeight="SemiBold"/>
+						<ComboBox ItemsSource="{Binding TypeOptions}"
+								  SelectedItem="{Binding SelectedType}"
+								  HorizontalAlignment="Stretch"/>
+					</StackPanel>
+					<StackPanel Grid.Column="1" Spacing="4">
+						<TextBlock Text="Стадия" FontWeight="SemiBold"/>
+						<ComboBox ItemsSource="{Binding StageOptions}"
+								  SelectedItem="{Binding SelectedStage}"
+								  HorizontalAlignment="Stretch"/>
+					</StackPanel>
+				</Grid>
+
+				<TextBlock Text="Участники" FontWeight="SemiBold" Margin="0,8,0,0"/>
+
+				<Border Background="White" CornerRadius="6" Padding="4" MaxHeight="220">
+					<ListBox ItemsSource="{Binding Parties}"
+							 SelectedItem="{Binding SelectedParty}"
+							 Background="Transparent"
+							 BorderThickness="0">
+						<ListBox.ItemTemplate>
+							<DataTemplate x:DataType="models:Party">
+								<StackPanel Spacing="2" Margin="4">
+									<StackPanel Orientation="Horizontal" Spacing="8">
+										<TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+										<TextBlock Text="—" Opacity="0.4"/>
+										<TextBlock Text="{Binding Role,
+                        Converter={x:Static conv:PartyRoleConverter.Instance}}"
+											Opacity="0.7" FontStyle="Italic"/>
+									</StackPanel>
+									<TextBlock Text="{Binding Contacts}" FontSize="11" Opacity="0.6"
+											   IsVisible="{Binding Contacts,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+									<TextBlock Text="{Binding Address}" FontSize="11" Opacity="0.6"
+											   IsVisible="{Binding Address,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+								</StackPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</Border>
+
+				<Button Content="🗑 Удалить выбранного участника"
+						Classes="danger"
+						Command="{Binding RemovePartyCommand}"
+						HorizontalAlignment="Left"/>
+
+				<!-- Форма добавления -->
+				<Border Background="#F8FAFC" CornerRadius="6" Padding="12"
+						BorderBrush="#E2E8F0" BorderThickness="1">
+					<StackPanel Spacing="8">
+						<TextBlock Text="Добавить участника" FontWeight="SemiBold" FontSize="13"/>
+						<Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+							<TextBox Grid.Column="0" Watermark="Имя"
+									 Text="{Binding NewPartyName}" Padding="10,8" CornerRadius="6"/>
+							<TextBox Grid.Column="1" Watermark="Роль (истец / defendant / ...)"
+									 Text="{Binding NewPartyRole}" Padding="10,8" CornerRadius="6"/>
+						</Grid>
+
+						<TextBox Watermark="Контакты (телефон, email)"
+								 Text="{Binding NewPartyContacts}" Padding="10,8" CornerRadius="6"/>
+						<TextBox Watermark="Адрес"
+								 Text="{Binding NewPartyAddress}" Padding="10,8" CornerRadius="6"/>
+						<TextBox Watermark="Описание / примечание"
+								 Text="{Binding NewPartyDescription}"
+								 AcceptsReturn="True" Height="60"
+								 TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
+
+						<Button Content="+ Добавить участника" Classes="primary"
+								Command="{Binding AddPartyCommand}"
+								HorizontalAlignment="Left"/>
+					</StackPanel>
+				</Border>
+
+			</StackPanel>
+		</ScrollViewer>
+
+		<StackPanel Grid.Row="1" Orientation="Horizontal"
+					HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+			<Button Content="Отмена" Classes="ghost" Command="{Binding CancelCommand}"/>
+			<Button Content="Сохранить" Classes="primary" Command="{Binding SaveCommand}"/>
+		</StackPanel>
+	</Grid>
+</Window>

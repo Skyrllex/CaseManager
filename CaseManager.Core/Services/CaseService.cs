@@ -34,11 +34,43 @@ public sealed class CaseService
 
     public IEnumerable<Case> ListAll() => _repo.LoadAll();
 
+    //Document
     public void AddDocument(Guid caseId, string filePath, string? comment = null)
     {
         var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
         var doc = _repo.AddDocument(caseId, filePath, comment);
         c.Documents.Add(doc);
+        _repo.Save(c);
+    }
+    public void UpdateDocumentMeta(Guid caseId, Guid docId,
+                               string? displayName = null,
+                               string? description = null,
+                               DocumentKind? kind = null,
+                               string? group = null)
+    {
+        var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
+        var d = c.Documents.FirstOrDefault(x => x.Id == docId);
+        if (d == null) return;
+
+        if (displayName != null) d.DisplayName = displayName.Trim();
+        if (description != null) d.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        if (kind != null) d.Kind = kind.Value;
+        if (group != null) d.Group = string.IsNullOrWhiteSpace(group) ? null : group.Trim();
+
+        _repo.Save(c);
+    }
+
+    /// Удалить документ
+    public void DeleteDocument(Guid caseId, Guid docId)
+    {
+        var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
+        var d = c.Documents.FirstOrDefault(x => x.Id == docId);
+        if (d == null) return;
+
+        try { _repo.DeleteDocumentFile(caseId, d); }
+        catch { /* файл занят */ }
+
+        c.Documents.Remove(d);
         _repo.Save(c);
     }
 

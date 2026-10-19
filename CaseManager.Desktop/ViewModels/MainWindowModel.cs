@@ -9,6 +9,7 @@ using CaseManager.Desktop.Views;
 using System.Linq;
 using System;
 using Avalonia.Controls;
+using System.Collections.Generic;
 
 namespace CaseManager.Desktop.ViewModels;
 
@@ -125,5 +126,59 @@ public partial class MainWindowViewModel : ViewModelBase
             viewer.ShowDialog(parent);
         else
             viewer.Show();
+    }
+    // Выбранный документ
+    [ObservableProperty] private CaseDocument? _selectedDocument;
+
+    // Фильтр документа: null = все
+    [ObservableProperty] private DocumentKind? _documentFilter;
+
+    public DocumentKind?[] DocumentFilterOptions { get; } =
+        new DocumentKind?[] { null, DocumentKind.Document, DocumentKind.Photo,
+                          DocumentKind.Video, DocumentKind.Audio, DocumentKind.Other };
+
+    // Отображаемый (фильтрованный) список документов
+    public IEnumerable<CaseDocument> FilteredDocuments =>
+        SelectedCase?.Documents
+            .Where(d => DocumentFilter == null || d.Kind == DocumentFilter)
+            .OrderByDescending(d => d.UploadedAt) ?? Enumerable.Empty<CaseDocument>();
+
+    partial void OnDocumentFilterChanged(DocumentKind? value)
+        => OnPropertyChanged(nameof(FilteredDocuments));
+
+    partial void OnSelectedCaseChanged(Case? value)
+    {
+        SelectedDocument = null;
+        OnPropertyChanged(nameof(FilteredDocuments));
+    }
+
+    [RelayCommand]
+    private void DeleteDocument(CaseDocument? doc)
+    {
+        if (doc == null || SelectedCase == null) return;
+        try { _service.DeleteDocument(SelectedCase.Id, doc.Id); }
+        catch { }
+        Refresh();
+        SelectedCase = Cases.FirstOrDefault(c => c.Id == SelectedCase!.Id);
+    }
+
+    // Редактирования  документа
+    [RelayCommand]
+    private void EditDocument(CaseDocument? doc)
+    {
+        if (doc == null || SelectedCase == null) return;
+
+        var caseId = SelectedCase.Id;
+        var docId = doc.Id;
+
+        var dialogVm = new DocumentEditViewModel(_service, caseId, doc);
+        var win = new DocumentEditWindow { DataContext = dialogVm };
+        dialogVm.OnSaved = () =>
+        {
+            win.Close();
+            Refresh();
+            SelectedCase = Cases.FirstOrDefault(c => c.Id == caseId);
+        };
+        win.ShowDialog(App.MainWindow!);
     }
 }

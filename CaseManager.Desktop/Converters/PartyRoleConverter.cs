@@ -23,7 +23,7 @@ public class PartyRoleConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string s && Ru.TryGetValue(s, out var ru)) return ru;
-        return value?.ToString();  // если не нашли — показываем как есть
+        return value?.ToString();  // на нет и суда нет
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

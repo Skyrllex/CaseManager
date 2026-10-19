@@ -51,9 +51,32 @@ public sealed class CaseRepository
 
         var bytes = File.ReadAllBytes(path);
         var json = _encryptor.Decrypt(bytes, _password);
-        return JsonSerializer.Deserialize<Case>(json, JsonOpts);
-    }
+        var c = JsonSerializer.Deserialize<Case>(json, JsonOpts);
+        if (c == null) return null;
 
+        c.Parties ??= new();
+        c.Parties.RemoveAll(p => p == null);
+        foreach (var p in c.Parties)
+        {
+            p.Name ??= "";
+            p.Role ??= "";
+        }
+
+        c.Documents ??= new();
+        c.Documents.RemoveAll(d => d == null);
+        foreach (var d in c.Documents)
+        {
+            d.FileName ??= "";
+            d.RelativePath ??= "";
+            if (string.IsNullOrWhiteSpace(d.DisplayName))
+                d.DisplayName = string.IsNullOrWhiteSpace(d.FileName)
+                    ? "(без имени)"
+                    : Path.GetFileNameWithoutExtension(d.FileName);
+            if (d.UploadedAt == default) d.UploadedAt = DateTime.UtcNow;
+        }
+
+        return c;
+    }
     public IEnumerable<Case> LoadAll()
     {
         foreach (var dir in Directory.GetDirectories(_root))
@@ -61,7 +84,7 @@ public sealed class CaseRepository
             if (!Guid.TryParse(Path.GetFileName(dir), out var id)) continue;
             Case? c = null;
             try { c = Load(id); }
-            catch { /* битый файл — пропускаем; можно логировать */ }
+            catch { /* битый файл - пропускаем */ }
             if (c != null) yield return c;
         }
     }
@@ -69,8 +92,20 @@ public sealed class CaseRepository
     public void Delete(Guid id)
     {
         var dir = CaseDir(id);
-        if (Directory.Exists(dir)) Directory.Delete(dir, true);
+        if (!Directory.Exists(dir)) return;
+
+        foreach (var f in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
+        {
+            try { File.SetAttributes(f, FileAttributes.Normal); } catch { }
+        }
+        try { Directory.Delete(dir, true); }
+        catch (IOException)
+        {
+            System.Threading.Thread.Sleep(100);
+            try { Directory.Delete(dir, true); } catch { }
+        }
     }
+
 
     public CaseDocument AddDocument(Guid caseId, string sourceFile, string? comment = null)
     {
@@ -82,7 +117,6 @@ public sealed class CaseRepository
 
         var fileName = Path.GetFileName(sourceFile);
         var dest = Path.Combine(docsDir, fileName);
-
         int i = 1;
         while (File.Exists(dest))
         {
@@ -91,26 +125,43 @@ public sealed class CaseRepository
             dest = Path.Combine(docsDir, $"{name}_{i++}{ext}");
         }
 
-        try
-        {
-            File.Copy(sourceFile, dest, overwrite: false);
-        }
+        try { File.Copy(sourceFile, dest, overwrite: false); }
         catch (Exception ex)
         {
-            // Частично скопированный файл — удалить
             try { if (File.Exists(dest)) File.Delete(dest); } catch { }
             throw new IOException($"Не удалось добавить файл «{fileName}»: {ex.Message}", ex);
         }
 
+        var fi = new FileInfo(dest);
+        var kind = DocumentKindHelper.FromFileName(dest);
+
         return new CaseDocument
         {
             FileName = Path.GetFileName(dest),
+            DisplayName = Path.GetFileNameWithoutExtension(dest),
             RelativePath = Path.Combine("docs", Path.GetFileName(dest)),
-            Comment = comment
+            Kind = kind,
+            Description = comment,
+            SizeBytes = fi.Length,
+            UploadedAt = DateTime.UtcNow
         };
     }
+
+    /// Удалить файл с диска.
+    public void DeleteDocumentFile(Guid caseId, CaseDocument doc)
+    {
+        if (string.IsNullOrWhiteSpace(doc.RelativePath)) return;
+        var full = Path.Combine(CaseDir(caseId), doc.RelativePath);
+        if (File.Exists(full))
+        {
+            try { File.SetAttributes(full, FileAttributes.Normal); } catch { }
+            File.Delete(full);
+        }
+    }
+
     public string? GetDocumentFullPath(Guid caseId, CaseDocument doc)
     {
+        if (doc == null || string.IsNullOrWhiteSpace(doc.RelativePath)) return null;
         var full = Path.Combine(CaseDir(caseId), doc.RelativePath);
         return File.Exists(full) ? full : null;
     }

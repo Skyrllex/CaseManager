@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CaseManager.Desktop.ViewModels"
+        x:Class="CaseManager.Desktop.Views.DocumentEditWindow"
+        x:DataType="vm:DocumentEditViewModel"
+        Title="Редактировать документ"
+        Width="520" Height="520"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8FAFC">
+
+  <Grid RowDefinitions="*,Auto" Margin="20">
+    <StackPanel Grid.Row="0" Spacing="14">
+
+      <TextBlock Text="Файл" FontWeight="SemiBold" Opacity="0.6"/>
+      <TextBlock Text="{Binding OriginalFileName}" FontFamily="Consolas, monospace"/>
+
+      <TextBlock Text="Отображаемое имя" FontWeight="SemiBold"/>
+      <TextBox Text="{Binding DisplayName}" Padding="10,8" CornerRadius="6"/>
+
+      <TextBlock Text="Тип материала" FontWeight="SemiBold"/>
+      <ComboBox ItemsSource="{Binding KindOptions}"
+                SelectedItem="{Binding SelectedKind}"
+                HorizontalAlignment="Stretch"/>
+
+      <TextBlock Text="Группа (необязательно)" FontWeight="SemiBold"/>
+      <TextBox Watermark="например: Том 1, Приложения"
+               Text="{Binding Group}" Padding="10,8" CornerRadius="6"/>
+
+      <TextBlock Text="Описание" FontWeight="SemiBold"/>
+      <TextBox Text="{Binding Description}"
+               AcceptsReturn="True" Height="100"
+               TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal"
+                HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+      <Button Content="Отмена" Classes="ghost" Command="{Binding CancelCommand}"/>
+      <Button Content="Сохранить" Classes="primary" Command="{Binding SaveCommand}"/>
+    </StackPanel>
+  </Grid>
+</Window>

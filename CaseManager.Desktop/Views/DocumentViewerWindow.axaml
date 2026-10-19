@@ -8,7 +8,7 @@
 
 	<Grid RowDefinitions="Auto,*" Margin="16">
 
-		<!-- Шапка: имя файла + кнопка "открыть в системе" -->
+
 		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
 			<TextBlock Grid.Column="0"
 					   Name="FileNameText"
@@ -22,11 +22,11 @@
 					HorizontalAlignment="Right"/>
 		</Grid>
 
-		<!-- Область просмотра -->
+
 		<Border Grid.Row="1" Background="White" CornerRadius="8" Padding="12">
 			<Grid>
 
-				<!-- Текстовый просмотр -->
+
 				<ScrollViewer Name="TextScroll" IsVisible="False">
 					<TextBlock Name="TextContent"
 							   TextWrapping="Wrap"
@@ -34,7 +34,7 @@
 							   FontSize="12"/>
 				</ScrollViewer>
 
-				<!-- Просмотр картинки -->
+
 				<ScrollViewer Name="ImageScroll" IsVisible="False">
 					<Image Name="ImageContent"
 						   Stretch="None"
@@ -42,7 +42,6 @@
 						   VerticalAlignment="Top"/>
 				</ScrollViewer>
 
-				<!-- Fallback: предпросмотр невозможен -->
 				<StackPanel Name="FallbackPanel"
 							IsVisible="False"
 							VerticalAlignment="Center" HorizontalAlignment="Center"

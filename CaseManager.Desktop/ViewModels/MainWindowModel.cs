@@ -152,8 +152,8 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(FilteredDocuments));
     }
 
-    [RelayCommand]
-    private void DeleteDocument(CaseDocument? doc)
+    //[RelayCommand]
+    public void DeleteDocument(CaseDocument? doc)
     {
         if (doc == null || SelectedCase == null) return;
         try { _service.DeleteDocument(SelectedCase.Id, doc.Id); }
@@ -163,8 +163,8 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     // Редактирования  документа
-    [RelayCommand]
-    private void EditDocument(CaseDocument? doc)
+    //[RelayCommand]
+    public void EditDocument(CaseDocument? doc)
     {
         if (doc == null || SelectedCase == null) return;
 

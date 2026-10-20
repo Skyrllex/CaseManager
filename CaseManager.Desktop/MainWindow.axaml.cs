@@ -47,4 +47,21 @@ public partial class MainWindow : Window
             }
         }
     }
+    private void OnEditDocumentClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button b && b.Tag is CaseDocument doc
+            && DataContext is MainWindowViewModel vm)
+        {
+            vm.EditDocument(doc);
+        }
+    }
+
+    private void OnDeleteDocumentClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button b && b.Tag is CaseDocument doc
+            && DataContext is MainWindowViewModel vm)
+        {
+            vm.DeleteDocument(doc);
+        }
+    }
 }

@@ -30,7 +30,7 @@
 				<ScrollViewer Name="TextScroll" IsVisible="False">
 					<TextBlock Name="TextContent"
 							   TextWrapping="Wrap"
-							   FontFamily="Consolas, Courier New, monospace"
+							   FontFamily="Сascadia Mono, Consolas, Courier New, monospace"
 							   FontSize="12"/>
 				</ScrollViewer>
 

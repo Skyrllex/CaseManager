@@ -1,15 +1,14 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CaseManager.Core.Models;
 using CaseManager.Core.Services;
 using CaseManager.Desktop.Views;
-using System.Linq;
-using System;
-using Avalonia.Controls;
-using System.Collections.Generic;
 
 namespace CaseManager.Desktop.ViewModels;
 
@@ -17,15 +16,57 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly CaseService _service;
 
+
     public ObservableCollection<Case> Cases { get; } = new();
 
     [ObservableProperty] private Case? _selectedCase;
 
+
+    [ObservableProperty] private CaseDocument? _selectedDocument;
+
+
+    public FilterOption[] DocumentFilterOptions => DocumentFilters.All;
+
+    [ObservableProperty] private FilterOption _selectedDocumentFilter;
+
+
+    public ObservableCollection<CaseDocument> FilteredDocuments { get; } = new();
+
+
+
     public MainWindowViewModel(CaseService service)
     {
         _service = service;
+        SelectedDocumentFilter = DocumentFilters.All[0]; // Все 
         Refresh();
     }
+
+    //Обновление
+
+    partial void OnSelectedDocumentFilterChanged(FilterOption value)
+        => RebuildFilteredDocuments();
+
+    partial void OnSelectedCaseChanged(Case? value)
+    {
+        SelectedDocument = null;
+        RebuildFilteredDocuments();
+    }
+
+    private void RebuildFilteredDocuments()
+    {
+        FilteredDocuments.Clear();
+        if (SelectedCase == null) return;
+
+        var kind = SelectedDocumentFilter?.Kind;
+        var docs = SelectedCase.Documents
+            .Where(d => kind == null || d.Kind == kind)
+            .OrderByDescending(d => d.UploadedAt);
+
+        foreach (var d in docs)
+            FilteredDocuments.Add(d);
+    }
+
+    // Список дел
 
     public void Refresh()
     {
@@ -35,7 +76,11 @@ public partial class MainWindowViewModel : ViewModelBase
             Cases.Add(c);
         if (selectedId != null)
             SelectedCase = Cases.FirstOrDefault(c => c.Id == selectedId);
+
+        RebuildFilteredDocuments();
     }
+
+    // дела
 
     [RelayCommand]
     private void CreateCase()
@@ -61,9 +106,11 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (SelectedCase == null) return;
         try { _service.Delete(SelectedCase.Id); }
-        catch { /* файл занят — пока просто игнорируем, позже добавим диалог */ }
+        catch { }
         Refresh();
     }
+
+    //Добавить документ
 
     [RelayCommand]
     private async Task AddDocument()
@@ -77,12 +124,12 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Title = "Выберите материалы дела",
             AllowMultiple = true,
-            FileTypeFilter = new[]
-            {
+            FileTypeFilter = new[]{
                 new FilePickerFileType("Все файлы") { Patterns = new[] { "*.*" } },
                 new FilePickerFileType("Документы")
                 {
-                    Patterns = new[] { "*.pdf", "*.doc", "*.docx", "*.txt", "*.rtf", "*.xls", "*.xlsx" }
+                    Patterns = new[] { "*.pdf", "*.doc", "*.docx", "*.txt", "*.rtf",
+                                       "*.xls", "*.xlsx" }
                 },
                 new FilePickerFileType("Изображения")
                 {
@@ -90,10 +137,12 @@ public partial class MainWindowViewModel : ViewModelBase
                 },
                 new FilePickerFileType("Видео / аудио")
                 {
-                    Patterns = new[] { "*.mp4", "*.mov", "*.avi", "*.mkv", "*.mp3", "*.wav", "*.m4a" }
+                    Patterns = new[] { "*.mp4", "*.mov", "*.avi", "*.mkv",
+                                       "*.mp3", "*.wav", "*.m4a" }
                 }
             }
         });
+
         var caseId = SelectedCase.Id;
         foreach (var f in files)
         {
@@ -101,7 +150,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (path != null)
             {
                 try { _service.AddDocument(caseId, path); }
-                catch { /* пропускаем битый файл */ }
+                catch { }
             }
         }
 
@@ -109,67 +158,53 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedCase = Cases.FirstOrDefault(c => c.Id == caseId);
     }
 
+    // открыть
+
     public void OpenDocument(CaseDocument? doc, Window? owner = null)
     {
         if (doc == null || SelectedCase == null) return;
 
-        var path = _service.GetDocumentFullPath(SelectedCase.Id, doc);
-        if (path == null)
+        try
         {
-            System.Diagnostics.Debug.WriteLine($"Файл не найден: {doc.FileName}");
-            return;
+            var path = _service.GetDocumentFullPath(SelectedCase.Id, doc);
+            if (path == null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Файл не найден: {doc.FileName}");
+                return;
+            }
+
+            var viewer = new DocumentViewerWindow(path);
+            var parent = owner ?? App.MainWindow;
+            if (parent != null) viewer.ShowDialog(parent);
+            else viewer.Show();
         }
-
-        var viewer = new DocumentViewerWindow(path);
-        var parent = owner ?? App.MainWindow;
-        if (parent != null)
-            viewer.ShowDialog(parent);
-        else
-            viewer.Show();
-    }
-    // Выбранный документ
-    [ObservableProperty] private CaseDocument? _selectedDocument;
-
-    // Фильтр документа: null = все
-    [ObservableProperty] private DocumentKind? _documentFilter;
-
-    public DocumentKind?[] DocumentFilterOptions { get; } =
-        new DocumentKind?[] { null, DocumentKind.Document, DocumentKind.Photo,
-                          DocumentKind.Video, DocumentKind.Audio, DocumentKind.Other };
-
-    // Отображаемый (фильтрованный) список документов
-    public IEnumerable<CaseDocument> FilteredDocuments =>
-        SelectedCase?.Documents
-            .Where(d => DocumentFilter == null || d.Kind == DocumentFilter)
-            .OrderByDescending(d => d.UploadedAt) ?? Enumerable.Empty<CaseDocument>();
-
-    partial void OnDocumentFilterChanged(DocumentKind? value)
-        => OnPropertyChanged(nameof(FilteredDocuments));
-
-    partial void OnSelectedCaseChanged(Case? value)
-    {
-        SelectedDocument = null;
-        OnPropertyChanged(nameof(FilteredDocuments));
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OpenDocument failed: {ex}");
+        }
     }
 
-    //[RelayCommand]
+    //  удалить 
+
     public void DeleteDocument(CaseDocument? doc)
     {
         if (doc == null || SelectedCase == null) return;
-        try { _service.DeleteDocument(SelectedCase.Id, doc.Id); }
+
+        var caseId = SelectedCase.Id;
+        try { _service.DeleteDocument(caseId, doc.Id); }
         catch { }
+
         Refresh();
-        SelectedCase = Cases.FirstOrDefault(c => c.Id == SelectedCase!.Id);
+        SelectedCase = Cases.FirstOrDefault(c => c.Id == caseId);
     }
 
-    // Редактирования  документа
-    //[RelayCommand]
+    //  редактировать
+
     public void EditDocument(CaseDocument? doc)
     {
         if (doc == null || SelectedCase == null) return;
 
         var caseId = SelectedCase.Id;
-        var docId = doc.Id;
 
         var dialogVm = new DocumentEditViewModel(_service, caseId, doc);
         var win = new DocumentEditWindow { DataContext = dialogVm };

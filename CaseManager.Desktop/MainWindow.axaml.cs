@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Одинарный - TappedEvent,  двойной - DoubleTappedEvent.
-        AddHandler(TappedEvent, OnDocumentTapped, RoutingStrategies.Bubble);
+        AddHandler(DoubleTappedEvent, OnDocumentTapped, RoutingStrategies.Bubble);
     }
 
     private void OnDocumentTapped(object? sender, TappedEventArgs e)

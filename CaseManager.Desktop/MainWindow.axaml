@@ -146,8 +146,8 @@
 
 						<!-- Фильтр -->
 						<StackPanel Orientation="Horizontal" Spacing="8">
-							<ComboBox ItemsSource="{Binding DocumentFilterOptions}"
-									  SelectedItem="{Binding DocumentFilter}"
+							<ComboBox ItemsSource="{Binding KindOptions}"
+									  SelectedItem="{Binding SelectedKind}"
 									  Width="180">
 								<ComboBox.ItemTemplate>
 									<DataTemplate>
@@ -212,7 +212,7 @@
 							</ItemsControl.ItemTemplate>
 						</ItemsControl>
 
-						<TextBlock Text="Клик по документу — просмотр, ✎ — редактировать, 🗑 — удалить"
+						<TextBlock Text="Двойной клик по документу — просмотр, ✎ — редактировать, 🗑 — удалить"
 								   FontSize="11" Opacity="0.45" FontStyle="Italic"/>
 					</StackPanel>
 					

@@ -1,4 +1,8 @@
-﻿namespace CaseManager.Core.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace CaseManager.Core.Models;
 
 public static class DocumentKindHelper
 {
@@ -10,21 +14,23 @@ public static class DocumentKindHelper
 
     private static readonly HashSet<string> PhotoExt = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".tif", ".tiff"
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".tif", ".tiff", ".heic"
     };
 
     private static readonly HashSet<string> VideoExt = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".wmv", ".flv"
+        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".wmv", ".flv", ".m4v", ".mpg", ".mpeg"
     };
 
     private static readonly HashSet<string> AudioExt = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".wma"
+        ".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".wma", ".opus"
     };
 
     public static DocumentKind FromFileName(string fileName)
     {
+        if (string.IsNullOrWhiteSpace(fileName)) return DocumentKind.Other;
+
         var ext = Path.GetExtension(fileName);
         if (string.IsNullOrEmpty(ext)) return DocumentKind.Other;
 

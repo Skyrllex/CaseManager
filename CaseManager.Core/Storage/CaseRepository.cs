@@ -72,9 +72,14 @@ public sealed class CaseRepository
                 d.DisplayName = string.IsNullOrWhiteSpace(d.FileName)
                     ? "(без имени)"
                     : Path.GetFileNameWithoutExtension(d.FileName);
-            if (d.UploadedAt == default) d.UploadedAt = DateTime.UtcNow;
-        }
 
+            if (d.Kind == DocumentKind.Other && !string.IsNullOrWhiteSpace(d.FileName))
+            {
+                var detected = DocumentKindHelper.FromFileName(d.FileName);
+                if (detected != DocumentKind.Other)
+                    d.Kind = detected;
+            }
+        }
         return c;
     }
     public IEnumerable<Case> LoadAll()

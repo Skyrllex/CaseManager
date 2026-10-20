@@ -146,21 +146,9 @@
 
 						<!-- Фильтр -->
 						<StackPanel Orientation="Horizontal" Spacing="8">
-							<ComboBox ItemsSource="{Binding KindOptions}"
-									  SelectedItem="{Binding SelectedKind}"
-									  Width="180">
-								<ComboBox.ItemTemplate>
-									<DataTemplate>
-										<TextBlock>
-											<TextBlock.Text>
-												<MultiBinding Converter="{x:Null}">
-													<Binding/>
-												</MultiBinding>
-											</TextBlock.Text>
-										</TextBlock>
-									</DataTemplate>
-								</ComboBox.ItemTemplate>
-							</ComboBox>
+							<ComboBox ItemsSource="{Binding DocumentFilterOptions}"
+									  SelectedItem="{Binding SelectedDocumentFilter}"
+									  Width="180"/>
 						</StackPanel>
 
 						<ItemsControl ItemsSource="{Binding FilteredDocuments}">
@@ -179,13 +167,16 @@
 													   FontSize="22" VerticalAlignment="Center"/>
 
 											<!-- Инфо -->
-											<StackPanel Grid.Column="1" Background="Transparent" Spacing="2">
+											<StackPanel Grid.Column="1" Background="Transparent"
+														Spacing="2" MinWidth="0">
 												<TextBlock Text="{Binding DisplayName}"
 														   FontWeight="SemiBold" FontSize="13"
 														   Foreground="#2563EB"
 														   Background="Transparent"
 														   TextTrimming="CharacterEllipsis"/>
-												<TextBlock FontSize="11" Opacity="0.55" Background="Transparent">
+												<TextBlock FontSize="11" Opacity="0.55"
+														   Background="Transparent"
+														   TextTrimming="CharacterEllipsis">
 													<Run Text="{Binding Kind,
                     Converter={x:Static conv:DocumentKindLabelConverter.Instance}}"/>
 													<Run Text=" · "/>
@@ -197,20 +188,30 @@
 												<TextBlock Text="{Binding Description}"
 														   FontSize="11" Opacity="0.65" TextWrapping="Wrap"
 														   Background="Transparent"
+														   MaxHeight="40"
 														   IsVisible="{Binding Description,
                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 											</StackPanel>
 
+
 											<!-- Кнопки действий -->
-											<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
-												<Button Tag="{Binding}" Click="OnEditDocumentClick" Content="✎"/>
-												<Button Tag="{Binding}" Click="OnDeleteDocumentClick" Content="🗑"/>
+											<StackPanel Grid.Column="2" Orientation="Horizontal"
+																	Spacing="4"
+																	HorizontalAlignment="Right"
+																	VerticalAlignment="Center">
+												<Button Content="✎" ToolTip.Tip="Редактировать"
+														Classes="ghost" Padding="8,4"
+														Tag="{Binding}" Click="OnEditDocumentClick"/>
+												<Button Content="🗑" ToolTip.Tip="Удалить"
+														Classes="danger" Padding="8,4"
+														Tag="{Binding}" Click="OnDeleteDocumentClick"/>
 											</StackPanel>
 										</Grid>
 									</Border>
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
 						</ItemsControl>
+
 
 						<TextBlock Text="Двойной клик по документу — просмотр, ✎ — редактировать, 🗑 — удалить"
 								   FontSize="11" Opacity="0.45" FontStyle="Italic"/>

@@ -1,11 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CaseManager.Core.Models;
 using CaseManager.Core.Services;
-using Avalonia;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System;
 
 namespace CaseManager.Desktop.ViewModels;
 
@@ -17,26 +15,16 @@ public partial class DocumentEditViewModel : ViewModelBase
 
     public Action? OnSaved { get; set; }
 
-    [ObservableProperty] private string _displayName;
-    [ObservableProperty] private string _description;
-    [ObservableProperty] private NamedKind _selectedKind;
-    [ObservableProperty] private string _group;
+    [ObservableProperty] private string _displayName = "";
+    [ObservableProperty] private string _description = "";
 
-    public record NamedKind(DocumentKind Kind, string Label)
-    {
-        public override string ToString() => Label;
-    }
+    [ObservableProperty] private string? _selectedGroup;
+    [ObservableProperty] private string _newGroupName = "";
 
-    public NamedKind[] KindOptions { get; } =
-    {
-        new(DocumentKind.Document, "📄 Документ"),
-        new(DocumentKind.Photo,    "🖼 Фото"),
-        new(DocumentKind.Video,    "🎬 Видео"),
-        new(DocumentKind.Audio,    "🎧 Аудио"),
-        new(DocumentKind.Other,    "📦 Другое")
-    };
+    public ObservableCollection<string> GroupOptions { get; } = new();
 
     public string OriginalFileName { get; }
+    public string KindLabel { get; }             
 
     public DocumentEditViewModel(CaseService service, Guid caseId, CaseDocument doc)
     {
@@ -47,23 +35,62 @@ public partial class DocumentEditViewModel : ViewModelBase
         OriginalFileName = doc.FileName;
         _displayName = doc.DisplayName ?? doc.FileName;
         _description = doc.Description ?? "";
-        _group = doc.Group ?? "";
-        _selectedKind = KindOptions.FirstOrDefault(k => k.Kind == doc.Kind) ?? KindOptions[0];
+        _selectedGroup = doc.Group;
+
+
+        KindLabel = doc.Kind switch
+        {
+            DocumentKind.Document => "📄 Документ",
+            DocumentKind.Photo => "📷 Фото",
+            DocumentKind.Video => "🎬 Видео",
+            DocumentKind.Audio => "🎧 Аудио",
+            _ => "📦 Другое"
+        };
+
+        RebuildGroups();
+    }
+
+    private void RebuildGroups()
+    {
+        GroupOptions.Clear();
+        GroupOptions.Add("(без группы)");
+
+        foreach (var g in _service.GetDocumentGroups(_caseId))
+            GroupOptions.Add(g);
+
+        if (!string.IsNullOrWhiteSpace(SelectedGroup) && !GroupOptions.Contains(SelectedGroup!))
+            GroupOptions.Add(SelectedGroup!);
+    }
+
+    [RelayCommand]
+    private void AddGroup()
+    {
+        if (string.IsNullOrWhiteSpace(NewGroupName)) return;
+        var name = NewGroupName.Trim();
+        _service.AddDocumentGroup(_caseId, name);
+
+        if (!GroupOptions.Contains(name))
+            GroupOptions.Add(name);
+
+        SelectedGroup = name;
+        NewGroupName = "";
     }
 
     [RelayCommand]
     private void Save()
     {
+        var groupValue = SelectedGroup == "(без группы)" ? null : SelectedGroup;
+
         _service.UpdateDocumentMeta(
             _caseId, _docId,
             displayName: DisplayName,
             description: Description,
-            kind: SelectedKind.Kind,
-            group: Group);
+            group: groupValue);
 
         OnSaved?.Invoke();
     }
 
     [RelayCommand]
     private void Cancel() => OnSaved?.Invoke();
+
 }

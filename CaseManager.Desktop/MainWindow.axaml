@@ -28,39 +28,50 @@
 
 		<!-- Список дел (слева)  -->
 		<Border Grid.Row="1" Grid.Column="0"
-				Background="White" CornerRadius="8" Padding="8"
-				BoxShadow="0 1 3 0 #14000000" Margin="0,0,12,0">
-			<ListBox ItemsSource="{Binding Cases}"
-					 SelectedItem="{Binding SelectedCase}"
-					 Background="Transparent"
-					 BorderThickness="0">
-				<ListBox.ItemTemplate>
-					<DataTemplate x:DataType="models:Case">
-						<StackPanel Spacing="4" Margin="4">
-							<TextBlock Text="{Binding Title}"
-									   FontWeight="SemiBold" FontSize="14"
-									   TextTrimming="CharacterEllipsis"/>
-							<TextBlock Text="{Binding ShortDescription}"
-									   FontSize="12" Opacity="0.6"
-									   TextTrimming="CharacterEllipsis"/>
-							<StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
-								<Border Background="#DBEAFE" CornerRadius="4" Padding="6,2">
-									<TextBlock Text="{Binding Type,
-                      Converter={x:Static conv:CaseTypeConverter.Instance}}"
-										FontSize="10" Foreground="#1E40AF"/>
-								</Border>
-								<Border Background="#DCFCE7" CornerRadius="4" Padding="6,2">
-									<TextBlock Text="{Binding Stage,
-                      Converter={x:Static conv:CaseStageConverter.Instance}}"
-										FontSize="10" Foreground="#166534"/>
-								</Border>
-							</StackPanel>
-						</StackPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
-		</Border>
+			 Background="White" CornerRadius="8" Padding="8"
+			 BoxShadow="0 1 3 0 #14000000" Margin="0,0,12,0">
+			<Grid RowDefinitions="Auto,*" RowSpacing="8">
 
+				<!-- Фильтр дел -->
+				<ComboBox Grid.Row="0"
+						  ItemsSource="{Binding CaseFilterOptions}"
+						  SelectedItem="{Binding SelectedCaseFilter}"
+						  HorizontalAlignment="Stretch"/>
+
+				<!-- Список -->
+				<ListBox Grid.Row="1"
+						 ItemsSource="{Binding FilteredCases}"
+						 SelectedItem="{Binding SelectedCase}"
+						 Background="Transparent"
+						 BorderThickness="0">
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="models:Case">
+							<StackPanel Spacing="4" Margin="4">
+								<TextBlock Text="{Binding Title}"
+										   FontWeight="SemiBold" FontSize="14"
+										   TextTrimming="CharacterEllipsis"/>
+								<TextBlock Text="{Binding ShortDescription}"
+										   FontSize="12" Opacity="0.6"
+										   TextTrimming="CharacterEllipsis"/>
+								<StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+									<Border Background="#DBEAFE" CornerRadius="4" Padding="6,2">
+										<TextBlock Text="{Binding Type,
+                        Converter={x:Static conv:CaseTypeConverter.Instance}}"
+											FontSize="10" Foreground="#1E40AF"/>
+									</Border>
+									<Border Background="#DCFCE7" CornerRadius="4" Padding="6,2">
+										<TextBlock Text="{Binding Stage,
+                        Converter={x:Static conv:CaseStageConverter.Instance}}"
+											FontSize="10" Foreground="#166534"/>
+									</Border>
+								</StackPanel>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Grid>
+		</Border>
+		
 		<!--  Детали дела (справа)-->
 		<Border Grid.Row="1" Grid.Column="1"
 				Background="White" CornerRadius="8" Padding="24"
@@ -149,6 +160,9 @@
 							<ComboBox ItemsSource="{Binding DocumentFilterOptions}"
 									  SelectedItem="{Binding SelectedDocumentFilter}"
 									  Width="180"/>
+							<ComboBox ItemsSource="{Binding DocumentGroups}"
+								  SelectedItem="{Binding SelectedDocumentGroup}"
+								  Width="180"/>
 						</StackPanel>
 
 						<ItemsControl ItemsSource="{Binding FilteredDocuments}">
@@ -168,7 +182,7 @@
 
 											<!-- Инфо -->
 											<StackPanel Grid.Column="1" Background="Transparent"
-														Spacing="2" MinWidth="0">
+																		Spacing="2" MinWidth="0">
 												<TextBlock Text="{Binding DisplayName}"
 														   FontWeight="SemiBold" FontSize="13"
 														   Foreground="#2563EB"
@@ -178,10 +192,10 @@
 														   Background="Transparent"
 														   TextTrimming="CharacterEllipsis">
 													<Run Text="{Binding Kind,
-                    Converter={x:Static conv:DocumentKindLabelConverter.Instance}}"/>
+                              Converter={x:Static conv:DocumentKindLabelConverter.Instance}}"/>
 													<Run Text=" · "/>
 													<Run Text="{Binding SizeBytes,
-                    Converter={x:Static conv:FileSizeConverter.Instance}}"/>
+                              Converter={x:Static conv:FileSizeConverter.Instance}}"/>
 													<Run Text=" · "/>
 													<Run Text="{Binding UploadedAt, StringFormat='{}{0:g}'}"/>
 												</TextBlock>
@@ -190,9 +204,8 @@
 														   Background="Transparent"
 														   MaxHeight="40"
 														   IsVisible="{Binding Description,
-                            Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 											</StackPanel>
-
 
 											<!-- Кнопки действий -->
 											<StackPanel Grid.Column="2" Orientation="Horizontal"

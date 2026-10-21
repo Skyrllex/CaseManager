@@ -43,10 +43,9 @@ public sealed class CaseService
         _repo.Save(c);
     }
     public void UpdateDocumentMeta(Guid caseId, Guid docId,
-                               string? displayName = null,
-                               string? description = null,
-                               DocumentKind? kind = null,
-                               string? group = null)
+                                   string? displayName = null,
+                                   string? description = null,
+                                   string? group = null)
     {
         var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
         var d = c.Documents.FirstOrDefault(x => x.Id == docId);
@@ -54,12 +53,10 @@ public sealed class CaseService
 
         if (displayName != null) d.DisplayName = displayName.Trim();
         if (description != null) d.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
-        if (kind != null) d.Kind = kind.Value;
         if (group != null) d.Group = string.IsNullOrWhiteSpace(group) ? null : group.Trim();
 
         _repo.Save(c);
     }
-
     /// Удалить документ
     public void DeleteDocument(Guid caseId, Guid docId)
     {
@@ -76,4 +73,83 @@ public sealed class CaseService
 
     public string? GetDocumentFullPath(Guid caseId, CaseDocument doc)
         => _repo.GetDocumentFullPath(caseId, doc);
+
+
+    // документов 
+
+
+    public IReadOnlyList<string> GetDocumentGroups(Guid caseId)
+    {
+        var c = _repo.Load(caseId);
+        if (c?.DocumentGroups == null) return Array.Empty<string>();
+
+        return c.DocumentGroups
+            .Where(g => !string.IsNullOrWhiteSpace(g))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(g => g, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+    }
+
+
+    public bool AddDocumentGroup(Guid caseId, string groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName)) return false;
+
+        var name = groupName.Trim();
+        var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
+        c.DocumentGroups ??= new List<string>();
+
+        if (c.DocumentGroups.Contains(name, StringComparer.OrdinalIgnoreCase))
+            return false; // уже есть
+
+        c.DocumentGroups.Add(name);
+        _repo.Save(c);
+        return true;
+    }
+
+    public bool DeleteDocumentGroup(Guid caseId, string groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName)) return false;
+
+        var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
+        if (c.DocumentGroups == null) return false;
+
+        var removed = c.DocumentGroups.RemoveAll(
+            g => g.Equals(groupName, StringComparison.OrdinalIgnoreCase)) > 0;
+
+        if (!removed) return false;
+
+  
+        foreach (var d in c.Documents)
+            if (d.Group != null && d.Group.Equals(groupName, StringComparison.OrdinalIgnoreCase))
+                d.Group = null;
+
+        _repo.Save(c);
+        return true;
+    }
+
+
+    public bool RenameDocumentGroup(Guid caseId, string oldName, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName)) return false;
+
+        var newTrim = newName.Trim();
+        var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
+        c.DocumentGroups ??= new List<string>();
+
+        var idx = c.DocumentGroups.FindIndex(g => g.Equals(oldName, StringComparison.OrdinalIgnoreCase));
+        if (idx < 0) return false;
+
+        if (c.DocumentGroups.Any(g => g.Equals(newTrim, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        c.DocumentGroups[idx] = newTrim;
+
+        foreach (var d in c.Documents)
+            if (d.Group != null && d.Group.Equals(oldName, StringComparison.OrdinalIgnoreCase))
+                d.Group = newTrim;
+
+        _repo.Save(c);
+        return true;
+    }
 }

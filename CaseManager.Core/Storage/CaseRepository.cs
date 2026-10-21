@@ -37,13 +37,13 @@ public sealed class CaseRepository
         Directory.CreateDirectory(dir);
         Directory.CreateDirectory(DocsDir(c.Id));
 
+        c.DocumentGroups ??= new List<string>();
         c.UpdatedAt = DateTime.UtcNow;
 
         var json = JsonSerializer.SerializeToUtf8Bytes(c, JsonOpts);
         var enc = _encryptor.Encrypt(json, _password);
         File.WriteAllBytes(MetaFile(c.Id), enc);
     }
-
     public Case? Load(Guid id)
     {
         var path = MetaFile(id);
@@ -54,6 +54,7 @@ public sealed class CaseRepository
         var c = JsonSerializer.Deserialize<Case>(json, JsonOpts);
         if (c == null) return null;
 
+        //участник
         c.Parties ??= new();
         c.Parties.RemoveAll(p => p == null);
         foreach (var p in c.Parties)
@@ -62,6 +63,7 @@ public sealed class CaseRepository
             p.Role ??= "";
         }
 
+        // doc
         c.Documents ??= new();
         c.Documents.RemoveAll(d => d == null);
         foreach (var d in c.Documents)
@@ -73,6 +75,8 @@ public sealed class CaseRepository
                     ? "(без имени)"
                     : Path.GetFileNameWithoutExtension(d.FileName);
 
+            if (d.UploadedAt == default) d.UploadedAt = DateTime.UtcNow;
+
             if (d.Kind == DocumentKind.Other && !string.IsNullOrWhiteSpace(d.FileName))
             {
                 var detected = DocumentKindHelper.FromFileName(d.FileName);
@@ -80,6 +84,20 @@ public sealed class CaseRepository
                     d.Kind = detected;
             }
         }
+
+        //group
+
+        c.DocumentGroups ??= new List<string>();
+        c.DocumentGroups.RemoveAll(string.IsNullOrWhiteSpace);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var cleaned = new List<string>();
+        foreach (var g in c.DocumentGroups)
+        {
+            var t = g.Trim();
+            if (seen.Add(t)) cleaned.Add(t);
+        }
+        c.DocumentGroups = cleaned;
+
         return c;
     }
     public IEnumerable<Case> LoadAll()
@@ -170,4 +188,5 @@ public sealed class CaseRepository
         var full = Path.Combine(CaseDir(caseId), doc.RelativePath);
         return File.Exists(full) ? full : null;
     }
+
 }

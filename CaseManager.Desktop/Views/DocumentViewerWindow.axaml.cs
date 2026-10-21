@@ -27,8 +27,8 @@ public partial class DocumentViewerWindow : Window
     {
         ".pdf", ".doc", ".docx", ".xls", ".xlsx",
         ".rtf", ".odt", ".ods",
-        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".wmv",   // видео — только внешне
-        ".mp3", ".wav", ".ogg", ".flac", ".m4a"            // аудио — только внешне
+        ".mp4", ".mov", ".avi", ".mkv", ".webm", ".wmv",   
+        ".mp3", ".wav", ".ogg", ".flac", ".m4a"            
     };
 
     private string _fullPath = "";
@@ -161,10 +161,9 @@ public partial class DocumentViewerWindow : Window
         }
     }
 
-    /// <summary>
     /// Проверка, что файл реально картинка — по magic bytes, а не по расширению.
     /// Защищает от переименованных .mp4 → .png и битых файлов.
-    /// </summary>
+
     private static bool IsRealImage(string path)
     {
         try

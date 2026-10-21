@@ -4,38 +4,54 @@
         x:Class="CaseManager.Desktop.Views.DocumentEditWindow"
         x:DataType="vm:DocumentEditViewModel"
         Title="Редактировать документ"
-        Width="520" Height="520"
+        Width="520" Height="560"
         WindowStartupLocation="CenterOwner"
         Background="#F8FAFC">
 
-  <Grid RowDefinitions="*,Auto" Margin="20">
-    <StackPanel Grid.Row="0" Spacing="14">
+	<Grid RowDefinitions="*,Auto" Margin="20">
+		<ScrollViewer Grid.Row="0">
+			<StackPanel Spacing="14">
 
-      <TextBlock Text="Файл" FontWeight="SemiBold" Opacity="0.6"/>
-      <TextBlock Text="{Binding OriginalFileName}" FontFamily="Сascadia Mono, Consolas, Courier New, monospace"/>
+				<TextBlock Text="Файл" FontWeight="SemiBold" Opacity="0.6"/>
+				<TextBlock Text="{Binding OriginalFileName}"
+						   FontFamily="Consolas, monospace"/>
 
-      <TextBlock Text="Отображаемое имя" FontWeight="SemiBold"/>
-      <TextBox Text="{Binding DisplayName}" Padding="10,8" CornerRadius="6"/>
+				<TextBlock Text="Тип материала" FontWeight="SemiBold" Opacity="0.6"/>
+				<Border Background="#F1F5F9" CornerRadius="6" Padding="10,8">
+					<TextBlock Text="{Binding KindLabel}" FontSize="13"/>
+				</Border>
 
-      <TextBlock Text="Тип материала" FontWeight="SemiBold"/>
-      <ComboBox ItemsSource="{Binding KindOptions}"
-                SelectedItem="{Binding SelectedKind}"
-                HorizontalAlignment="Stretch"/>
+				<TextBlock Text="Отображаемое имя" FontWeight="SemiBold"/>
+				<TextBox Text="{Binding DisplayName}" Padding="10,8" CornerRadius="6"/>
 
-      <TextBlock Text="Группа (необязательно)" FontWeight="SemiBold"/>
-      <TextBox Watermark="например: Том 1, Приложения"
-               Text="{Binding Group}" Padding="10,8" CornerRadius="6"/>
 
-      <TextBlock Text="Описание" FontWeight="SemiBold"/>
-      <TextBox Text="{Binding Description}"
-               AcceptsReturn="True" Height="100"
-               TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
-    </StackPanel>
+				<TextBlock Text="Группа" FontWeight="SemiBold"/>
+				<ComboBox ItemsSource="{Binding GroupOptions}"
+						  SelectedItem="{Binding SelectedGroup}"
+						  HorizontalAlignment="Stretch"/>
 
-    <StackPanel Grid.Row="1" Orientation="Horizontal"
-                HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
-      <Button Content="Отмена" Classes="ghost" Command="{Binding CancelCommand}"/>
-      <Button Content="Сохранить" Classes="primary" Command="{Binding SaveCommand}"/>
-    </StackPanel>
-  </Grid>
+				<Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+					<TextBox Grid.Column="0"
+							 Watermark="Новая группа (например: Блок 1)"
+							 Text="{Binding NewGroupName}"
+							 Padding="10,8" CornerRadius="6"/>
+					<Button Grid.Column="1"
+							Content="+ Создать группу"
+							Classes="primary"
+							Command="{Binding AddGroupCommand}"/>
+				</Grid>
+
+				<TextBlock Text="Описание" FontWeight="SemiBold"/>
+				<TextBox Text="{Binding Description}"
+						 AcceptsReturn="True" Height="100"
+						 TextWrapping="Wrap" Padding="10,8" CornerRadius="6"/>
+			</StackPanel>
+		</ScrollViewer>
+
+		<StackPanel Grid.Row="1" Orientation="Horizontal"
+					HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+			<Button Content="Отмена" Classes="ghost" Command="{Binding CancelCommand}"/>
+			<Button Content="Сохранить" Classes="primary" Command="{Binding SaveCommand}"/>
+		</StackPanel>
+	</Grid>
 </Window>

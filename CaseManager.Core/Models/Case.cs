@@ -15,4 +15,6 @@ public class Case
 
     public List<Party> Parties { get; set; } = new();
     public List<CaseDocument> Documents { get; set; } = new();
+
+    public List<string> DocumentGroups { get; set; } = new();
 }

@@ -64,4 +64,6 @@ public partial class MainWindow : Window
             vm.DeleteDocument(doc);
         }
     }
+
+
 }

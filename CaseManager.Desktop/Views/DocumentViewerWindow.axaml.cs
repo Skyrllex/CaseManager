@@ -66,13 +66,13 @@ public partial class DocumentViewerWindow : Window
 
         var ext = Path.GetExtension(_fullPath);
 
-        // 1) Текст — только если расширение текстовое И файл не гигантский
+        // 1) Текст
         if (TextExts.Contains(ext))
         {
             try
             {
                 var fi = new FileInfo(_fullPath);
-                if (fi.Length > 5 * 1024 * 1024) // >5 МБ текста — не грузим
+                if (fi.Length > 5 * 1024 * 1024) // >5 МБ не грузим
                 {
                     ShowFallback("Файл слишком большой для предпросмотра (более 5 МБ).");
                     return;
@@ -89,11 +89,11 @@ public partial class DocumentViewerWindow : Window
             }
             catch
             {
-                // упадём в fallback
+                //  fallback
             }
         }
 
-        // 2) Картинка — только если расширение картинки И сигнатура файла совпадает
+        // 2) Картинка 
         if (ImageExts.Contains(ext) && IsRealImage(_fullPath))
         {
             try
@@ -104,11 +104,11 @@ public partial class DocumentViewerWindow : Window
             }
             catch
             {
-                // упадём в fallback
+                //  fallback
             }
         }
 
-        // 3) Всё остальное (видео, pdf, dll, exe, архив) — fallback
+        // 3) Всё остальное (видео, pdf, dll, exe, архив) 
         if (ExternalSafeExts.Contains(ext))
             ShowFallback("Встроенный просмотр недоступен. Откройте файл во внешнем приложении.");
         else

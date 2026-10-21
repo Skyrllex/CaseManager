@@ -32,16 +32,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public CaseFilterOption[] CaseFilterOptions { get; } =
     {
-        new(null, null,                             "Все дела"),
-        new(null, CaseStage.Started,                "🟡 Старт"),
-        new(null, CaseStage.InProgress,             "🟢 Идёт процесс"),
-        new(null, CaseStage.Appeal,                 "🟠 Апелляция"),
-        new(null, CaseStage.Cassation,              "🟣 Кассация"),
-        new(null, CaseStage.Closed,                 "⚪️ Завершено"),
-        new(CaseType.Civil,          null,          "📘 Гражданские"),
-        new(CaseType.Criminal,       null,          "📕 Уголовные"),
-        new(CaseType.Administrative, null,          "📙 Административные"),
-        new(CaseType.Arbitration,    null,          "📗 Арбитражные")
+        new(null, null, "Все дела"),
+        new(null, CaseStage.Started, "🟡 Старт"),
+        new(null, CaseStage.InProgress, "🟢 Идёт процесс"),
+        new(null, CaseStage.Appeal, "🟠 Апелляция"),
+        new(null, CaseStage.Cassation, "🟣 Кассация"),
+        new(null, CaseStage.Closed, "⚪️ Завершено"),
+        new(CaseType.Civil, null, "📘 Гражданские"),
+        new(CaseType.Criminal, null, "📕 Уголовные"),
+        new(CaseType.Administrative, null, "📙 Административные"),
+        new(CaseType.Arbitration, null, "📗 Арбитражные"),
+        new(CaseType.Other, null, "📒 Иное")  
     };
 
     [ObservableProperty] private CaseFilterOption _selectedCaseFilter = null!;

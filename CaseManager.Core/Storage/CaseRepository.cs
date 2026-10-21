@@ -66,8 +66,8 @@ public sealed class CaseRepository
         // doc
         c.Documents ??= new();
         c.Documents.RemoveAll(d => d == null);
-        foreach (var d in c.Documents)
-        {
+        foreach(var d in c.Documents)
+{
             d.FileName ??= "";
             d.RelativePath ??= "";
             if (string.IsNullOrWhiteSpace(d.DisplayName))
@@ -83,8 +83,18 @@ public sealed class CaseRepository
                 if (detected != DocumentKind.Other)
                     d.Kind = detected;
             }
+            //пересчеи веса
+            if (d.SizeBytes <= 0 && !string.IsNullOrWhiteSpace(d.RelativePath))
+            {
+                try
+                {
+                    var full = Path.Combine(CaseDir(id), d.RelativePath);
+                    if (File.Exists(full))
+                        d.SizeBytes = new FileInfo(full).Length;
+                }
+                catch { }
+            }
         }
-
         //group
 
         c.DocumentGroups ??= new List<string>();

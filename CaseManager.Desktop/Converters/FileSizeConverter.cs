@@ -7,10 +7,9 @@ namespace CaseManager.Desktop.Converters;
 public class FileSizeConverter : IValueConverter
 {
     public static readonly FileSizeConverter Instance = new();
-
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not long bytes) return "";
+        if (value is not long bytes || bytes <= 0) return "—";
         string[] units = { "Б", "КБ", "МБ", "ГБ" };
         double size = bytes;
         int i = 0;

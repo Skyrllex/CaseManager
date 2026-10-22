@@ -10,14 +10,18 @@ public class DocumentKindLabelConverter : IValueConverter
     public static readonly DocumentKindLabelConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is DocumentKind k ? k switch
+    {
+        if (value is not DocumentKind k) return "?";
+        return k switch
         {
             DocumentKind.Document => "Документ",
             DocumentKind.Photo => "Фото",
             DocumentKind.Video => "Видео",
             DocumentKind.Audio => "Аудио",
-            _ => "Другое"
-        } : "Другое";
+            DocumentKind.Other => "Другое",
+            _ => "?"
+        };
+    }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();

@@ -126,7 +126,7 @@
 												<TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
 												<TextBlock Text="—" Opacity="0.4"/>
 												<TextBlock Text="{Binding Role,
-										Converter={x:Static conv:PartyRoleConverter.Instance}}"
+										Converter={x:Static conv:PartyRoleConverter.Instance}, Mode=OneWay}"
 													Opacity="0.7" FontStyle="Italic"/>
 											</StackPanel>
 											<TextBlock Text="{Binding Contacts}" FontSize="11" Opacity="0.6"
@@ -151,7 +151,7 @@
 						<StackPanel Orientation="Horizontal" Spacing="8">
 							<TextBlock Text="Материалы дела" FontWeight="SemiBold" FontSize="14"/>
 							<TextBlock Text="{Binding SelectedCase.Documents.Count,
-        StringFormat='({0})'}"
+        StringFormat='({0})', Mode=OneWay}"
 								FontSize="12" Opacity="0.5" VerticalAlignment="Center"/>
 						</StackPanel>
 
@@ -177,7 +177,7 @@
 											<!-- Иконка -->
 											<TextBlock Grid.Column="0"
 													   Text="{Binding Kind,
-                           Converter={x:Static conv:DocumentKindIconConverter.Instance}}"
+                           Converter={x:Static conv:DocumentKindIconConverter.Instance}, Mode=OneWay}"
 													   FontSize="22" VerticalAlignment="Center"/>
 
 											<!-- Инфо -->
@@ -192,10 +192,10 @@
 														   Background="Transparent"
 														   TextTrimming="CharacterEllipsis">
 													<Run Text="{Binding Kind,
-                              Converter={x:Static conv:DocumentKindLabelConverter.Instance}}"/>
+                              Converter={x:Static conv:DocumentKindLabelConverter.Instance}, Mode=OneWay}"/>
 													<Run Text=" · "/>
 													<Run Text="{Binding SizeBytes,
-                              Converter={x:Static conv:FileSizeConverter.Instance}}"/>
+                              Converter={x:Static conv:FileSizeConverter.Instance}, Mode=OneWay}"/>
 													<Run Text=" · "/>
 													<Run Text="{Binding UploadedAt, StringFormat='{}{0:g}'}"/>
 												</TextBlock>
@@ -204,7 +204,7 @@
 														   Background="Transparent"
 														   MaxHeight="40"
 														   IsVisible="{Binding Description,
-                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}, Mode=OneWay}"/>
 											</StackPanel>
 
 											<!-- Кнопки действий -->

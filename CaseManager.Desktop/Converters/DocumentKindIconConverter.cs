@@ -10,14 +10,18 @@ public class DocumentKindIconConverter : IValueConverter
     public static readonly DocumentKindIconConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is DocumentKind k ? k switch
+    {
+        if (value is not DocumentKind k) return "❓";
+        return k switch
         {
             DocumentKind.Document => "📄",
-            DocumentKind.Photo => "🖼",
+            DocumentKind.Photo => "📷",
             DocumentKind.Video => "🎬",
             DocumentKind.Audio => "🎧",
-            _ => "📦"
-        } : "📦";
+            DocumentKind.Other => "📦",
+            _ => "❓"
+        };
+    }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();

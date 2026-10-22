@@ -162,7 +162,11 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         FilteredDocuments.Clear();
         if (SelectedCase == null) return;
-
+       /* foreach (var d in SelectedCase.Documents)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[DOC] {d.FileName}: Kind={d.Kind}, Size={d.SizeBytes}");
+        }*/
         var kind = SelectedDocumentFilter?.Kind;
         var group = SelectedDocumentGroup;
 

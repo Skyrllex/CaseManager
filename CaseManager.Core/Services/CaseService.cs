@@ -35,12 +35,13 @@ public sealed class CaseService
     public IEnumerable<Case> ListAll() => _repo.LoadAll();
 
     //Document
-    public void AddDocument(Guid caseId, string filePath, string? comment = null)
+    public CaseDocument AddDocument(Guid caseId, string filePath, string? comment = null)
     {
         var c = _repo.Load(caseId) ?? throw new InvalidOperationException("Дело не найдено");
         var doc = _repo.AddDocument(caseId, filePath, comment);
         c.Documents.Add(doc);
-        _repo.Save(c);
+        _repo.Save(c); 
+        return doc;
     }
     public void UpdateDocumentMeta(Guid caseId, Guid docId,
                                    string? displayName = null,

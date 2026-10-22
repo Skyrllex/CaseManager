@@ -40,6 +40,23 @@ public sealed class CaseRepository
         c.DocumentGroups ??= new List<string>();
         c.UpdatedAt = DateTime.UtcNow;
 
+        foreach (var d in c.Documents)
+        {
+            if (string.IsNullOrWhiteSpace(d.FileName)) continue;
+
+            var detected = DocumentKindHelper.FromFileName(d.FileName);
+            if (detected != DocumentKind.Other)
+                d.Kind = detected;
+
+            try
+            {
+                var full = Path.Combine(dir, d.RelativePath ?? Path.Combine("docs", d.FileName));
+                if (File.Exists(full))
+                    d.SizeBytes = new FileInfo(full).Length;
+            }
+            catch { }
+        }
+
         var json = JsonSerializer.SerializeToUtf8Bytes(c, JsonOpts);
         var enc = _encryptor.Encrypt(json, _password);
         File.WriteAllBytes(MetaFile(c.Id), enc);
@@ -54,7 +71,6 @@ public sealed class CaseRepository
         var c = JsonSerializer.Deserialize<Case>(json, JsonOpts);
         if (c == null) return null;
 
-        //участник
         c.Parties ??= new();
         c.Parties.RemoveAll(p => p == null);
         foreach (var p in c.Parties)
@@ -63,11 +79,10 @@ public sealed class CaseRepository
             p.Role ??= "";
         }
 
-        // doc
         c.Documents ??= new();
         c.Documents.RemoveAll(d => d == null);
-        foreach(var d in c.Documents)
-{
+        foreach (var d in c.Documents)
+        {
             d.FileName ??= "";
             d.RelativePath ??= "";
             if (string.IsNullOrWhiteSpace(d.DisplayName))
@@ -76,26 +91,7 @@ public sealed class CaseRepository
                     : Path.GetFileNameWithoutExtension(d.FileName);
 
             if (d.UploadedAt == default) d.UploadedAt = DateTime.UtcNow;
-
-            if (d.Kind == DocumentKind.Other && !string.IsNullOrWhiteSpace(d.FileName))
-            {
-                var detected = DocumentKindHelper.FromFileName(d.FileName);
-                if (detected != DocumentKind.Other)
-                    d.Kind = detected;
-            }
-            //пересчеи веса
-            if (d.SizeBytes <= 0 && !string.IsNullOrWhiteSpace(d.RelativePath))
-            {
-                try
-                {
-                    var full = Path.Combine(CaseDir(id), d.RelativePath);
-                    if (File.Exists(full))
-                        d.SizeBytes = new FileInfo(full).Length;
-                }
-                catch { }
-            }
         }
-        //group
 
         c.DocumentGroups ??= new List<string>();
         c.DocumentGroups.RemoveAll(string.IsNullOrWhiteSpace);
@@ -150,6 +146,7 @@ public sealed class CaseRepository
 
         var fileName = Path.GetFileName(sourceFile);
         var dest = Path.Combine(docsDir, fileName);
+
         int i = 1;
         while (File.Exists(dest))
         {
@@ -159,14 +156,11 @@ public sealed class CaseRepository
         }
 
         try { File.Copy(sourceFile, dest, overwrite: false); }
-        catch (Exception ex)
-        {
-            try { if (File.Exists(dest)) File.Delete(dest); } catch { }
-            throw new IOException($"Не удалось добавить файл «{fileName}»: {ex.Message}", ex);
-        }
+        catch (Exception ex) { };
+
 
         var fi = new FileInfo(dest);
-        var kind = DocumentKindHelper.FromFileName(dest);
+        var kind = DocumentKindHelper.FromFile(dest);
 
         return new CaseDocument
         {
@@ -175,11 +169,10 @@ public sealed class CaseRepository
             RelativePath = Path.Combine("docs", Path.GetFileName(dest)),
             Kind = kind,
             Description = comment,
-            SizeBytes = fi.Length,
+            SizeBytes = fi.Length,   // ← ЭТО
             UploadedAt = DateTime.UtcNow
         };
     }
-
     /// Удалить файл с диска.
     public void DeleteDocumentFile(Guid caseId, CaseDocument doc)
     {

@@ -93,4 +93,18 @@ public partial class DocumentEditViewModel : ViewModelBase
     [RelayCommand]
     private void Cancel() => OnSaved?.Invoke();
 
+    [RelayCommand]
+    private void DeleteGroup()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedGroup)) return;
+        if (SelectedGroup == "(без группы)") return;
+
+        _service.DeleteDocumentGroup(_caseId, SelectedGroup);
+
+
+        var removed = SelectedGroup;
+        GroupOptions.Remove(removed);
+
+        SelectedGroup = "(без группы)";
+    }
 }

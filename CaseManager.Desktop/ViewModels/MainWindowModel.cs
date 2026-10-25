@@ -261,8 +261,13 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
 
-        Refresh();
-        SelectedCase = Cases.FirstOrDefault(c => c.Id == caseId);
+        // Перечитываем ТОЛЬКО это дело
+        var fresh = _service.Get(caseId);
+        if (fresh == null) return;
+
+        SelectedCase = fresh;
+        RebuildDocumentGroups();
+        RebuildFilteredDocuments();
     }
 
 

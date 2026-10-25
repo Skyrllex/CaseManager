@@ -4,7 +4,7 @@
         x:Class="CaseManager.Desktop.Views.DocumentEditWindow"
         x:DataType="vm:DocumentEditViewModel"
         Title="Редактировать документ"
-        Width="520" Height="560"
+        Width="520" Height="600"
         WindowStartupLocation="CenterOwner"
         Background="#F8FAFC">
 
@@ -24,11 +24,19 @@
 				<TextBlock Text="Отображаемое имя" FontWeight="SemiBold"/>
 				<TextBox Text="{Binding DisplayName}" Padding="10,8" CornerRadius="6"/>
 
-
 				<TextBlock Text="Группа" FontWeight="SemiBold"/>
-				<ComboBox ItemsSource="{Binding GroupOptions}"
-						  SelectedItem="{Binding SelectedGroup}"
-						  HorizontalAlignment="Stretch"/>
+
+				<Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+					<ComboBox Grid.Column="0"
+							  ItemsSource="{Binding GroupOptions}"
+							  SelectedItem="{Binding SelectedGroup}"
+							  HorizontalAlignment="Stretch"/>
+					<Button Grid.Column="1"
+							Content="🗑 Удалить группу"
+							Classes="danger"
+							Command="{Binding DeleteGroupCommand}"
+							ToolTip.Tip="Удалить выбранную группу (документы останутся)"/>
+				</Grid>
 
 				<Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
 					<TextBox Grid.Column="0"
@@ -38,7 +46,7 @@
 					<Button Grid.Column="1"
 							Content="+ Создать группу"
 							Classes="primary"
-							Command="{Binding AddGroupCommand}"/>
+							          Command="{Binding AddGroupCommand}"/>
 				</Grid>
 
 				<TextBlock Text="Описание" FontWeight="SemiBold"/>

@@ -76,7 +76,7 @@ public sealed class CaseService
         => _repo.GetDocumentFullPath(caseId, doc);
 
 
-    // документов 
+    // группы документов 
 
 
     public IReadOnlyList<string> GetDocumentGroups(Guid caseId)
@@ -90,7 +90,6 @@ public sealed class CaseService
             .OrderBy(g => g, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
     }
-
 
     public bool AddDocumentGroup(Guid caseId, string groupName)
     {
@@ -153,4 +152,5 @@ public sealed class CaseService
         _repo.Save(c);
         return true;
     }
+
 }

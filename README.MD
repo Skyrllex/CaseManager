@@ -61,7 +61,6 @@ dotnet run --project CaseManager.Desktop
 > ⚠️ Запишите пароль. Если забудете — данные не восстановить (это осознанная плата за безопасность).
 
 ### 2. Главное окно
-'''
 ┌─────────────────────────────────────────────────────────────┐
 │ [+ Новое дело] [✎ Редактировать] [📎 Добавить] [🗑 Удалить]  │
 ├─────────────────────┬───────────────────────────────────────┤
@@ -74,7 +73,6 @@ dotnet run --project CaseManager.Desktop
 │                     │  📄 документ.pdf  12 КБ  ✎ 🗑          │
 │                     │  📷 фото.png      200 КБ ✎ 🗑          │
 └─────────────────────┴───────────────────────────────────────┘
-'''
 - Слева — список дел и фильтр (по стадии / типу судопроизводства).
 - Справа — карточка дела: название, цель, описание, участники, материалы.
 - Тулбар сверху — действия над делом.
@@ -120,7 +118,6 @@ dotnet run --project CaseManager.Desktop
 ---
 
 ## Структура проекта
-'''
 CaseManager.sln
 ├── CaseManager.Core/                 # бизнес-логика, не зависит от UI
 │   ├── Models/
@@ -168,7 +165,6 @@ CaseManager.sln
         ├── DocumentEditWindow.axaml (+ .cs)
         └── DocumentViewerWindow.axaml (+ .cs)
 
-'''
 ## Где хранятся данные
 
 Всё — в папке **Документы/CaseManager/** (или ~/Documents/CaseManager на Linux/macOS).
@@ -231,7 +227,7 @@ CaseManager.sln
 
 ## Сборка и запуск
 ### Через CLI
-'''bash
+---
 # восстановить зависимости
 dotnet restore
 
@@ -240,7 +236,8 @@ dotnet build
 
 # запустить desktop
 dotnet run --project CaseManager.Desktop
-'''
+---
+
 
 ### Через Visual Studio
 
@@ -250,10 +247,11 @@ dotnet run --project CaseManager.Desktop
 
 ### Публикация (self-contained, один exe)
 
-'''bash
+---
 dotnet publish CaseManager.Desktop -c Release -r win-x64 --self-contained true \
     -p:PublishSingleFile=true -p:PublishTrimmed=true
-'''
+---
+
 - Файлы документов в docs/ — хранятся как есть. Их можно открыть любым приложением. Если нужна полная защита — планируется в v2 (шифрование каждого файла .enc + временная расшифровка при просмотре).
 - Имена файлов в docs/ — видны в проводнике.
 - Мастер-пароль — не хранится, не восстанавливается. Если забыли — данные потеряны.
@@ -373,7 +371,7 @@ MIT — используйте, модифицируйте, распростра
 - [CommunityToolkit.Mvvm](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/) — за [ObservableProperty] и [RelayCommand]
 - [.NET](https://dotnet.microsoft.com/) — за AesGcm и Pbkdf2, которые делают шифрование простым
 
---
 
 Автор: skyrllex
+
 Вопросы / идеи: создайте Issue в репозитории

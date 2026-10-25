@@ -362,12 +362,6 @@ dotnet publish CaseManager.Desktop -c Release -r win-x64 --self-contained true \
 
 ---
 
-## Лицензия
-
-MIT — используйте, модифицируйте, распространяйте свободно.
-
----
- 
 ## Благодарности
 
 - [Avalonia UI](https://avaloniaui.net/) — за кроссплатформенный XAML
@@ -375,6 +369,17 @@ MIT — используйте, модифицируйте, распростра
 - [.NET](https://dotnet.microsoft.com/) — за AesGcm и Pbkdf2, которые делают шифрование простым
 
 
-Автор: skyrllex
+## 👤 Author
 
-Вопросы / идеи: создайте Issue в репозитории
+Skyrllex
+- GitHub: https://github.com/skyrllex
+
+---
+
+## 📄 License
+
+Copyright (c) 2026 Skyrllex. All rights reserved.
+
+This software is proprietary and confidential. Unauthorized copying, distribution, or modification is strictly prohibited.
+
+---

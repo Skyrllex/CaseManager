@@ -43,9 +43,9 @@ dotnet restore
 dotnet build
 '''
 ### Запуск
-'''bash
+```
 dotnet run --project CaseManager.Desktop
-'''
+```
 Или из Visual Studio: открыть CaseManager.sln, выбрать Set as Startup Project → CaseManager.Desktop, нажать F5.
 
 При первом запуске появится окно ввода мастер-пароля — запомните его, восстановить доступ к делам без него невозможно.
@@ -115,9 +115,10 @@ dotnet run --project CaseManager.Desktop
 - Дела слева: «Все дела / 🟡 Старт / 🟢 Идёт процесс / 🟠 Апелляция / … / 📘 Гражданские / 📕 Уголовные / …».
 - Документы справа: тип (📄/📷/🎬/🎧/📦) + группа.
 
----
+```
 
 ## Структура проекта
+```
 CaseManager.sln
 ├── CaseManager.Core/                 # бизнес-логика, не зависит от UI
 │   ├── Models/
@@ -164,11 +165,11 @@ CaseManager.sln
         ├── CaseEditorWindow.axaml (+ .cs)
         ├── DocumentEditWindow.axaml (+ .cs)
         └── DocumentViewerWindow.axaml (+ .cs)
-
+```
 ## Где хранятся данные
 
 Всё — в папке **Документы/CaseManager/** (или ~/Documents/CaseManager на Linux/macOS).
-'''
+```
 Документы/CaseManager/
 └── <guid-дела>/                    # одна папка = одно дело
     ├── case.json.enc               # метаданные (AES-GCM)
@@ -177,7 +178,7 @@ CaseManager.sln
         ├── договор-аренды.docx
         ├── фото-места-происшествия.jpg
         └── ...
-'''
+```
 
 - **case.json.enc** — зашифрованный JSON с названием, целью, участниками, списком документов, справочником групп.
 - **docs/ — файлы документов как есть** (не шифруются — так удобно открывать их внешними программами).
@@ -227,7 +228,7 @@ CaseManager.sln
 
 ## Сборка и запуск
 ### Через CLI
----
+```bash
 # восстановить зависимости
 dotnet restore
 
@@ -236,8 +237,7 @@ dotnet build
 
 # запустить desktop
 dotnet run --project CaseManager.Desktop
----
-
+```
 
 ### Через Visual Studio
 
@@ -247,10 +247,10 @@ dotnet run --project CaseManager.Desktop
 
 ### Публикация (self-contained, один exe)
 
----
+```bash
 dotnet publish CaseManager.Desktop -c Release -r win-x64 --self-contained true \
     -p:PublishSingleFile=true -p:PublishTrimmed=true
----
+```
 
 - Файлы документов в docs/ — хранятся как есть. Их можно открыть любым приложением. Если нужна полная защита — планируется в v2 (шифрование каждого файла .enc + временная расшифровка при просмотре).
 - Имена файлов в docs/ — видны в проводнике.
@@ -284,7 +284,7 @@ dotnet publish CaseManager.Desktop -c Release -r win-x64 --self-contained true \
 ## Сборка и запуск
 
 ### Через CLI
-
+```bash
 # восстановить зависимости
 dotnet restore
 
@@ -293,6 +293,7 @@ dotnet build
 
 # запустить desktop
 dotnet run --project CaseManager.Desktop
+```
 ### Через Visual Studio
 
 1. Открыть CaseManager.sln.
